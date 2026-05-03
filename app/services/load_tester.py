@@ -53,3 +53,29 @@ async def send_single_request(
             "latency_ms": round(latency_ms, 2),
             "error": str(error)
         }
+
+async def run_sequential_test(
+    url: str,
+    method: str,
+    headers: Optional[Dict[str, str]],
+    body: Optional[Dict[str, Any]],
+    request_count: int,
+    timeout: float
+) -> Dict[str, Any]:
+    results = []
+
+    for _ in range(request_count):
+        result = await send_single_request(
+            url=url,
+            method=method,
+            headers=headers,
+            body=body,
+            timeout=timeout
+        )
+
+        results.append(result)
+
+    return {
+        "request_count": request_count,
+        "results": results
+    }

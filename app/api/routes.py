@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from app.schemas.test_run import TestRunRequest
-from app.services.load_tester import send_single_request
+from app.services.load_tester import run_sequential_test
 
 router = APIRouter()
 
@@ -15,17 +15,19 @@ def health_check():
 
 @router.post("/tests/run")
 async def run_test(request: TestRunRequest):
-    result = await send_single_request(
+    test_result = await run_sequential_test(
         url=str(request.url),
         method=request.method,
         headers=request.headers,
         body=request.body,
+        request_count=request.request_count,
         timeout=request.timeout
     )
 
     return {
-        "message": "Single request test completed",
+        "message": "Sequential test completed",
         "target": str(request.url),
         "method": request.method,
-        "result": result
+        "concurrency": request.concurrency,
+        "data": test_result
     }
